@@ -2,12 +2,26 @@ require "rails_helper"
 
 RSpec.describe "Posts", type: :request do
   describe "GET /posts" do
-    before { get "/posts" }
-
     it "should return OK" do
+      get "/posts"
       payload = JSON.parse(response.body)
       expect(payload).to be_empty
       expect(response).to have_http_status(200)
+    end
+
+    describe "Search" do
+      let!(:hola_mundo) { create(:published_post, title: "Hola mundo") }
+      let!(:hola_rails) { create(:published_post, title: "Hola rails") }
+      let!(:curso_rails) { create(:published_post, title: "Curso rails") }
+
+      it "should filter posts by title" do
+        get "/posts?search=Hola"
+      payload = JSON.parse(response.body)
+      expect(payload).not_to be_empty
+      expect(payload.size).to eq(2)
+      expect(payload.map { |p| p["id"] }.sort).to eq([ hola_mundo.id, hola_rails.id ].sort)
+      expect(response).to have_http_status(200)
+      end
     end
   end
 
@@ -30,6 +44,12 @@ RSpec.describe "Posts", type: :request do
       payload = JSON.parse(response.body)
       expect(payload).not_to be_empty
       expect(payload["id"]).to eq(post.id)
+      expect(payload["title"]).to eq(post.title)
+      expect(payload["content"]).to eq(post.content)
+      expect(payload["published"]).to eq(post.published)
+      expect(payload["author"]["name"]).to eq(post.user.name)
+      expect(payload["author"]["email"]).to eq(post.user.email)
+      expect(payload["author"]["id"]).to eq(post.user.id)
       expect(response).to have_http_status(200)
     end
   end
