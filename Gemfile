@@ -49,6 +49,10 @@ group :development, :test do
   gem "faker"
 end
 
+group :development do
+  gem "letter_opener"
+end
+
 group :test do
   gem "shoulda-matchers"
   gem "database_cleaner"
