@@ -13,6 +13,7 @@ RSpec.describe "Posts with authentication", type: :request do
 
   describe "GET /posts/{id}" do
     context "with valid auth" do
+      before { allow(JsonWebToken).to receive(:verify).and_return([ { email: user.email } ]) }
       context "when requisting other's author post" do
         context "when post is public" do
           before { get "/posts/#{other_user_post.id}", headers: auth_headers }
@@ -47,6 +48,7 @@ RSpec.describe "Posts with authentication", type: :request do
   describe "POST /posts" do
     # con auth -> crear
     context "with valid auth" do
+      before { allow(JsonWebToken).to receive(:verify).and_return([ { email: user.email } ]) }
       before { post "/posts", params: create_params, headers: auth_headers }
 
       context "payload" do
@@ -76,6 +78,7 @@ RSpec.describe "Posts with authentication", type: :request do
   describe "PUT /posts" do
     # con auth ->
     context "with valid auth" do
+      before { allow(JsonWebToken).to receive(:verify).and_return([ { email: user.email } ]) }
       # actualizar un post nuestro
       context "when updating user's post" do
         before { put "/posts/#{user_post.id}", params: update_params, headers: auth_headers }
